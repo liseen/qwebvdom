@@ -81,11 +81,18 @@ static void dumpVElement(vdom::Node* vdom_elem, HTMLElement* elem) {
         return;
     }
 
-    vdom_elem->set_type(vdom::Node::ELEMENT);
-    RefPtr<CSSComputedStyleDeclaration> style = computedStyle(elem);
-    if (style->getPropertyValue(cssPropertyID("display")) == "none") {
+    if (!elem->renderer()) {
+        //fprintf(stderr, "no render tag_name: %s\n", elem->tagName().utf8().data());
+        //fprintf(stderr, "no render tag_name: %s\n", elem->outerHTML().utf8().data());
         return;
     }
+
+    vdom_elem->set_type(vdom::Node::ELEMENT);
+    RefPtr<CSSComputedStyleDeclaration> style = computedStyle(elem);
+    //if (style->getPropertyValue(cssPropertyID("display")) == "none") {
+        //fprintf(stderr, "no display tag_name: %s\n", elem->tagName().utf8().data());
+    //    return;
+    //}
 
     std::string tag_name(elem->tagName().utf8().data());
     vdom_elem->set_id(elem->getAttribute("id").string().utf8().data());
@@ -142,12 +149,12 @@ static void dumpVElement(vdom::Node* vdom_elem, HTMLElement* elem) {
     }
 
     if (tag_name == "FRAME" || tag_name == "IFRAME") {
-        /*
         HTMLFrameOwnerElement* frameElem = static_cast<HTMLFrameOwnerElement*>(elem);
-        if (frameElem && frameElem->contentWindow()) {
-            dumpVWindow(frameElem->contentWindow());
+        if (frameElem && frameElem->contentWindow() &&
+                frameElem->contentWindow()->document() &&
+                frameElem->contentWindow()->document()->body()) {
+            dumpVElement(vdom_elem->add_child_nodes(), static_cast<HTMLElement*>(frameElem->contentWindow()->document()->body()));
         }
-        */
     } else {
         dumpVChildren(vdom_elem, elem);
     }

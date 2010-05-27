@@ -18,7 +18,7 @@
 #include "qwebkitglobal.h"
 
 #include <list>
-#include "vdom.pb.h"
+#include <vdom.h>
 
 class QWebFrame;
 class QWebVDomPrivate;

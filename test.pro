@@ -2,8 +2,8 @@ TEMPLATE = app
 SOURCES +=\
     test.cpp 
 
-HEADERS += vdom.h qwebvdom.h
+HEADERS += qwebvdom.h
 
-INCLUDEPATH  = ./
+INCLUDEPATH  = ./ ../libvdom/ 
 LIBS = -lprotobuf -lvdom 
 QT += webkit
