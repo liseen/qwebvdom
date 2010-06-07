@@ -4,6 +4,6 @@ SOURCES +=\
 
 HEADERS += qwebvdom.h
 
-INCLUDEPATH  = ./ ../libvdom/ 
-LIBS = -lprotobuf -lvdom 
+INCLUDEPATH  = /opt/qcrawler-thirdparty/include
+LIBS = -L /opt/qcrawler-thirdparty/lib -lprotobuf -lvdom 
 QT += webkit

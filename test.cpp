@@ -47,7 +47,7 @@ SLOT(quit()));
     QWebVDom *webvdom = new QWebVDom(frame);
     ::vdom::Window window;
     webvdom->buildVdom(&window);
-    std::cout << window.Utf8DebugString();
-    view->show();
-    app.exec();
+    std::cout << window.Utf8DebugString() << std::flush;
+    //view->show();
+    //app.exec();
 }
