@@ -73,34 +73,45 @@ static void dumpVDocument(vdom::Document* vdom_doc, HTMLDocument* doc) {
     vdom_doc->set_height(doc->height());
     vdom_doc->set_title(doc->title().utf8().data());
 
-    dumpVElement(vdom_doc->mutable_body(), static_cast<HTMLElement*>(doc->body()));
+    if (doc->body()) {
+        dumpVElement(vdom_doc->mutable_body(), static_cast<HTMLElement*>(doc->body()));
+    }
 }
 
 static void dumpVElement(vdom::Node* vdom_elem, HTMLElement* elem) {
-    if (!elem) {
-        return;
-    }
-
-    if (!elem->renderer()) {
-        //fprintf(stderr, "no render tag_name: %s\n", elem->tagName().utf8().data());
-        //fprintf(stderr, "no render tag_name: %s\n", elem->outerHTML().utf8().data());
-        return;
-    }
-
     vdom_elem->set_type(vdom::Node::ELEMENT);
     RefPtr<CSSComputedStyleDeclaration> style = computedStyle(elem);
-    //if (style->getPropertyValue(cssPropertyID("display")) == "none") {
-        //fprintf(stderr, "no display tag_name: %s\n", elem->tagName().utf8().data());
-    //    return;
-    //}
-
     std::string tag_name(elem->tagName().utf8().data());
-    vdom_elem->set_id(elem->getAttribute("id").string().utf8().data());
-    vdom_elem->set_name(elem->getAttribute("name").string().utf8().data());
     vdom_elem->set_tag_name(tag_name);
-    vdom_elem->set_class_name(elem->getAttribute("class").string().utf8().data());
 
-    FloatPoint absPos = static_cast<RenderObject*>(elem->renderer())->localToAbsolute();
+    if (elem->hasAttribute("id")) {
+        vdom_elem->set_id(elem->getAttribute("id").string().utf8().data());
+    }
+
+    if (elem->hasAttribute("name")) {
+        vdom_elem->set_name(elem->getAttribute("name").string().utf8().data());
+    }
+
+    if (elem->hasAttribute("class")) {
+        vdom_elem->set_class_name(elem->getAttribute("class").string().utf8().data());
+    }
+
+    RenderObject *ro = static_cast<RenderObject*>(elem->renderer());
+    if (ro->isRenderBlock()) {
+        vdom_elem->set_render_type(vdom::Node::BLOCK);
+    } else if (ro->isRenderInline()) {
+        vdom_elem->set_render_type(vdom::Node::INLINE);
+    } else if (ro->isImage()) {
+        vdom_elem->set_render_type(vdom::Node::IMAGE);
+    } else if (ro->isVideo()) {
+        vdom_elem->set_render_type(vdom::Node::VIDEO);
+    } else {
+        vdom_elem->set_render_type(vdom::Node::OTHER);
+    }
+
+
+
+    FloatPoint absPos = ro->localToAbsolute();
     int posX = absPos.x();
     int posY = absPos.y();
 
@@ -167,11 +178,15 @@ static void dumpVChildren(vdom::Node* vdom_elem, HTMLElement* elem) {
         Node* child = children->item(i);
         if (child->isElementNode()) {
             HTMLElement* child_elem = static_cast<HTMLElement*>(child);
-            String tagName = child_elem->tagName();
+            /*String tagName = child_elem->tagName();
             if (tagName == "SCRIPT"
                     || tagName == "STYLE"
                     || tagName == "NOSCRIPT"
                     || tagName == "LINK") {
+                continue;
+            }*/
+
+            if (!child_elem || !child_elem->renderer() || child_elem->tagName().isNull()) {
                 continue;
             }
 
@@ -196,7 +211,6 @@ static void dumpVTextNode(vdom::Node* vdom_text, Node* node) {
         int posY = absPos.y();
 
         IntRect rect = text->linesBoundingBox();
-
 
         vdom_text->set_x(rect.x() + posX);
         vdom_text->set_y(rect.y() + posY);

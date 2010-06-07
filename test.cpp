@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
     QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptEnabled, false);
     QWebSettings::globalSettings()->setAttribute(QWebSettings::AutoLoadImages, false);
     QWebSettings::globalSettings()->setAttribute(QWebSettings::JavaEnabled, false);
-
+    QWebSettings::globalSettings()->setAttribute(QWebSettings::AutoLoadImages, false);
     QWebSettings::globalSettings()->setDefaultTextEncoding("GB18030-0");
     QWebSettings::globalSettings()->setDefaultTextEncoding("GB18030-0");
     QWebSettings::globalSettings()->setAttribute(QWebSettings::JavaEnabled, false);
@@ -32,6 +32,7 @@ int main(int argc, char* argv[])
     QWebView* view = new QWebView(NULL);
     QWebPage* page = view->page();
 
+    page->setViewportSize(QSize(947, 843));
     QEventLoop loop;
     QUrl url("http://www.baidu.com");
     if (argc > 1) {
@@ -48,6 +49,5 @@ SLOT(quit()));
     webvdom->buildVdom(&window);
     std::cout << window.Utf8DebugString();
     view->show();
-    qDebug() << "web frame\n";
     app.exec();
 }
