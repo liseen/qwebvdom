@@ -141,8 +141,8 @@ static void dumpVElement(vdom::Node* vdom_elem, HTMLElement* elem) {
 
 
     FloatPoint absPos = ro->localToAbsolute();
-    int posX = absPos.x();
-    int posY = absPos.y();
+    int posX = (int)absPos.x();
+    int posY = (int)absPos.y();
 
     vdom_elem->set_x(posX);
     vdom_elem->set_y(posY);
@@ -236,8 +236,8 @@ static void dumpVTextNode(vdom::Node* vdom_text, Node* node) {
     RenderText* text = static_cast<RenderText*>(node->renderer());
     if (text) {
         FloatPoint absPos = text->localToAbsolute();
-        int posX = absPos.x();
-        int posY = absPos.y();
+        int posX = (int)absPos.x();
+        int posY = (int)absPos.y();
 
         IntRect rect = text->linesBoundingBox();
 
