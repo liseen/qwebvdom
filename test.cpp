@@ -47,7 +47,12 @@ SLOT(quit()));
     QWebVDom *webvdom = new QWebVDom(frame);
     ::vdom::Window window;
     webvdom->buildVdom(&window);
-    std::cout << window.Utf8DebugString() << std::flush;
-    //view->show();
-    //app.exec();
+    std::cout << window.Utf8DebugString() << std::endl;
+    std::cout << "code: " << webvdom->httpStatusCode() << std::flush;
+    std::cout << "mimetype: " << webvdom->mimeType() << std::endl;
+    std::cout << "last_modified: " << webvdom->lastModified() << std::endl;
+    std::cout << "expires: " << webvdom->expires() << std::endl;
+    std::cout << std::flush;
+    view->show();
+    app.exec();
 }

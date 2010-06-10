@@ -20,9 +20,11 @@
 #include "HTMLDocument.h"
 #include "DOMWindow.h"
 #include "HTMLElement.h"
+#include "HTMLHeadElement.h"
 #include "HTMLLinkElement.h"
 #include "HTMLInputElement.h"
 #include "HTMLImageElement.h"
+#include "HTMLMetaElement.h"
 #include "HTMLFrameOwnerElement.h"
 #include "RenderView.h"
 #include "Location.h"
@@ -40,6 +42,9 @@
 #include "wtf/HashMap.h"
 #include "HTMLElement.h"
 #include "HTMLDocument.h"
+#include "FrameLoader.h"
+#include "ResourceResponse.h"
+#include "DocumentLoader.h"
 #include <wtf/RefCountedLeakCounter.h>
 #include "InlineTextBox.h"
 #include "CString.h"
@@ -72,6 +77,30 @@ static void dumpVDocument(vdom::Document* vdom_doc, HTMLDocument* doc) {
     vdom_doc->set_width(doc->width());
     vdom_doc->set_height(doc->height());
     vdom_doc->set_title(doc->title().utf8().data());
+
+    if (doc->head()) {
+        RefPtr<NodeList> list = doc->head()->getElementsByTagName("meta");
+        unsigned len = list->length();
+        for (unsigned i = 0; i < len; i++) {
+            HTMLMetaElement* meta = static_cast<HTMLMetaElement*>(list->item(i));
+            assert(meta != NULL);
+            if (meta->name().lower() == "keywords") {
+                if (vdom_doc->has_keywords()) {
+                    vdom_doc->mutable_keywords()->append(" ");
+                    vdom_doc->mutable_keywords()->append(meta->content().utf8().data());
+                } else {
+                    vdom_doc->set_keywords(meta->content().utf8().data());
+                }
+            } else if (meta->name().lower() == "description") {
+                if (vdom_doc->has_description()) {
+                    vdom_doc->mutable_description()->append(" ");
+                    vdom_doc->mutable_description()->append(meta->content().utf8().data());
+                } else {
+                    vdom_doc->set_description(meta->content().utf8().data());
+                }
+            }
+        }
+    }
 
     if (doc->body()) {
         dumpVElement(vdom_doc->mutable_body(), static_cast<HTMLElement*>(doc->body()));
@@ -232,7 +261,37 @@ bool QWebVDom::buildVdom(vdom::Window *vdom_win) {
     return true;
 }
 
-QWebVDom::~QWebVDom() {
+int QWebVDom::httpStatusCode() {
+    Frame* frame = QWebFramePrivate::core(m_qframe);
+    return frame->loader()->documentLoader()->response().httpStatusCode();
 }
 
+int QWebVDom::lastModified() {
+    Frame* frame = QWebFramePrivate::core(m_qframe);
+    double last = frame->loader()->documentLoader()->response().lastModified();
+    if (last == std::numeric_limits<double>::quiet_NaN()) {
+        return -1;
+    } else {
+        return (int)last;
+    }
+}
+
+int QWebVDom::expires() {
+    Frame* frame = QWebFramePrivate::core(m_qframe);
+    double e =  frame->loader()->documentLoader()->response().expires();
+    if (e == std::numeric_limits<double>::quiet_NaN()) {
+        return -1;
+    } else {
+        return (int)e;
+    }
+}
+
+std::string QWebVDom::mimeType() {
+    Frame* frame = QWebFramePrivate::core(m_qframe);
+    std::string mime(frame->loader()->documentLoader()->response().mimeType().utf8().data());
+    return mime;
+}
+
+QWebVDom::~QWebVDom() {
+}
 

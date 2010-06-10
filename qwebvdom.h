@@ -31,10 +31,13 @@ public:
     ~QWebVDom();
 
     bool buildVdom(vdom::Window *vdom_win);
+    int httpStatusCode();
+    int lastModified();
+    int expires();
+    std::string mimeType();
 
 private:
     QWebFrame *m_qframe;
-
 };
 
 #endif // QWEBVDOM_H
