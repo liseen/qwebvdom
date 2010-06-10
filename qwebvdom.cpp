@@ -269,7 +269,8 @@ int QWebVDom::httpStatusCode() {
 int QWebVDom::lastModified() {
     Frame* frame = QWebFramePrivate::core(m_qframe);
     double last = frame->loader()->documentLoader()->response().lastModified();
-    if (last == std::numeric_limits<double>::quiet_NaN()) {
+    // check std::numeric_limits<double>::quiet_NaN()
+    if (last != last) {
         return -1;
     } else {
         return (int)last;
@@ -279,7 +280,9 @@ int QWebVDom::lastModified() {
 int QWebVDom::expires() {
     Frame* frame = QWebFramePrivate::core(m_qframe);
     double e =  frame->loader()->documentLoader()->response().expires();
-    if (e == std::numeric_limits<double>::quiet_NaN()) {
+
+    // check std::numeric_limits<double>::quiet_NaN()
+    if (e != e) {
         return -1;
     } else {
         return (int)e;
