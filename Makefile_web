@@ -11,7 +11,7 @@ WEBKIT_OBJECTS=$(WEBCORE)/obj/release/pcre_compile.o $(WEBCORE)/obj/release/pcre
 all: libqwebvdom.so
 
 qwebvdom.o: qwebvdom.cpp
-	g++ -c -m64 -pipe -Wreturn-type -fno-strict-aliasing -g -O0 -D_REENTRANT -fPIC -DQT_SHARED  $(WEBKIT_CFLAGS) $(WEBKIT_INCPATH) -o qwebvdom.o qwebvdom.cpp
+	g++ -c -m64 -pipe -Wreturn-type -fno-strict-aliasing -g -O2 -D_REENTRANT -fPIC -DQT_SHARED  $(WEBKIT_CFLAGS) $(WEBKIT_INCPATH) -o qwebvdom.o qwebvdom.cpp
 
 libqwebvdom.so : qwebvdom.o
 	g++ -m64 -Wl,-rpath-link,/home/xunxin.wan/qt-everywhere-opensource-src-4.6.2/lib -Wl,--no-undefined -Wl,--gc-sections -Wl,-O1 -Wl,-rpath,/opt/qt/lib -Wl,-rpath,/opt/qt/lib -shared -Wl,-soname,libQtWebKit.so.4 -o libQtWebKit.so.4.6.2 $(WEBKIT_OBJECTS) qwebvdom.o -L/home/xunxin.wan/qt-everywhere-opensource-src-4.6.2/lib -L/usr/X11R6/lib64 -lphonon -L/home/xunxin.wan/qt-everywhere-opensource-src-4.6.2/lib -lQtDBus -lQtXml -L/usr/X11R6/lib64 -lQtXmlPatterns -lQtGui -lQtNetwork -lQtCore -lpthread -lXrender -lfontconfig -lfreetype -lXext -lX11 -lm -L/opt/qcrawler-thirdparty/lib -lvdom -lprotobuf

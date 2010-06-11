@@ -193,7 +193,7 @@ static void dumpVElement(vdom::Node* vdom_elem, HTMLElement* elem) {
         if (frameElem && frameElem->contentWindow() &&
                 frameElem->contentWindow()->document() ) {
             HTMLElement *frame_body = static_cast<HTMLElement*>(frameElem->contentWindow()->document()->body());
-            if (frame_body || frame_body->renderer()) {
+            if (frame_body && frame_body->renderer()) {
                 dumpVElement(vdom_elem->add_child_nodes(), frame_body);
             }
         }
@@ -256,6 +256,11 @@ QWebVDom::QWebVDom(QWebFrame* qframe) {
 
 bool QWebVDom::buildVdom(vdom::Window *vdom_win) {
     Frame* frame = QWebFramePrivate::core(m_qframe);
+
+    if (!frame) {
+        return false;
+    }
+
     DOMWindow* win = frame->domWindow();
 
     dumpVWindow(vdom_win, win);
@@ -265,11 +270,19 @@ bool QWebVDom::buildVdom(vdom::Window *vdom_win) {
 
 int QWebVDom::httpStatusCode() {
     Frame* frame = QWebFramePrivate::core(m_qframe);
+    if (!frame) {
+        return 0;
+    }
+
     return frame->loader()->documentLoader()->response().httpStatusCode();
 }
 
 int QWebVDom::lastModified() {
     Frame* frame = QWebFramePrivate::core(m_qframe);
+    if (!frame) {
+        return -1;
+    }
+
     double last = frame->loader()->documentLoader()->response().lastModified();
     // check std::numeric_limits<double>::quiet_NaN()
     if (last != last) {
@@ -281,6 +294,10 @@ int QWebVDom::lastModified() {
 
 int QWebVDom::expires() {
     Frame* frame = QWebFramePrivate::core(m_qframe);
+    if (!frame) {
+        return -1;
+    }
+
     double e =  frame->loader()->documentLoader()->response().expires();
 
     // check std::numeric_limits<double>::quiet_NaN()
@@ -293,6 +310,10 @@ int QWebVDom::expires() {
 
 std::string QWebVDom::mimeType() {
     Frame* frame = QWebFramePrivate::core(m_qframe);
+    if (!frame) {
+        return std::string();
+    }
+
     std::string mime(frame->loader()->documentLoader()->response().mimeType().utf8().data());
     return mime;
 }
