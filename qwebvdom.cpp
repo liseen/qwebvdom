@@ -102,7 +102,7 @@ static void dumpVDocument(vdom::Document* vdom_doc, HTMLDocument* doc) {
         }
     }
 
-    if (doc->body()) {
+    if (doc->body() && doc->body()->renderer()) {
         dumpVElement(vdom_doc->mutable_body(), static_cast<HTMLElement*>(doc->body()));
     }
 }
@@ -191,9 +191,11 @@ static void dumpVElement(vdom::Node* vdom_elem, HTMLElement* elem) {
     if (tag_name == "FRAME" || tag_name == "IFRAME") {
         HTMLFrameOwnerElement* frameElem = static_cast<HTMLFrameOwnerElement*>(elem);
         if (frameElem && frameElem->contentWindow() &&
-                frameElem->contentWindow()->document() &&
-                frameElem->contentWindow()->document()->body()) {
-            dumpVElement(vdom_elem->add_child_nodes(), static_cast<HTMLElement*>(frameElem->contentWindow()->document()->body()));
+                frameElem->contentWindow()->document() ) {
+            HTMLElement *frame_body = static_cast<HTMLElement*>(frameElem->contentWindow()->document()->body());
+            if (frame_body || frame_body->renderer()) {
+                dumpVElement(vdom_elem->add_child_nodes(), frame_body);
+            }
         }
     } else {
         dumpVChildren(vdom_elem, elem);
